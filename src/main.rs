@@ -10,6 +10,7 @@ use std::{
     time::Duration,
 };
 
+use crate::theme::ThemeType;
 use clap::Parser;
 use crossterm::{
     cursor::RestorePosition,
@@ -32,24 +33,21 @@ use ratatui::{
 use running_command::RunningCommand;
 use state::AppState;
 use tempdir::TempDir;
-use theme::THEMES;
 
-/// This is a binary :), Chris, change this to update the documentation on -h
+/// Linux Toolbox
 #[derive(Debug, Parser)]
 struct Args {
-    /// Enable compatibility mode (disable icons and RGB colors)
-    #[arg(short, long, default_value_t = false)]
-    compat: bool,
+    // Allow the user to select a theme
+    #[arg(short, long, value_enum)]
+    #[arg(default_value_t = ThemeType::Default)]
+    #[arg(help = "Select a theme for the application")]
+    theme: ThemeType,
 }
 
 fn main() -> std::io::Result<()> {
     let args = Args::parse();
 
-    let theme = if args.compat {
-        THEMES[0].clone()
-    } else {
-        THEMES[1].clone()
-    };
+    let theme = args.theme.into();
     let commands_dir = include_dir!("src/commands");
     let temp_dir: TempDir = TempDir::new("linutil_scripts").unwrap();
     commands_dir
