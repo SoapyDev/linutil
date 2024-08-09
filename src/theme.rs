@@ -35,12 +35,13 @@ pub enum ThemeType {
     #[default]
     Default,
     Compatible,
+    Colorblind,
 }
 
 // This is for the clap parser to be able to parse the theme type
 impl ValueEnum for ThemeType {
     fn value_variants<'a>() -> &'a [Self] {
-        &[Self::Default, Self::Compatible]
+        &[Self::Default, Self::Compatible, Self::Colorblind]
     }
 
     fn from_str(input: &str, ignore_case: bool) -> Result<Self, String> {
@@ -53,6 +54,7 @@ impl ValueEnum for ThemeType {
         match input.as_str() {
             "default" => Ok(Self::Default),
             "compatible" => Ok(Self::Compatible),
+            "colorblind" => Ok(Self::Colorblind),
             _ => Err(format!("Invalid theme type: {input}")),
         }
     }
@@ -61,6 +63,7 @@ impl ValueEnum for ThemeType {
         Some(match self {
             Self::Default => PossibleValue::new("default"),
             Self::Compatible => PossibleValue::new("compatible"),
+            Self::Colorblind => PossibleValue::new("colorblind"),
         })
     }
 }
@@ -78,6 +81,18 @@ impl Into<Theme> for ThemeType {
                 success_color: Color::Green,
                 fail_color: Color::Red,
             },
+            ThemeType::Colorblind => {
+                // Bang Wong color palette - Slightly tweaked to be lighter for readability
+                // https://davidmathlogic.com/colorblind/#%23000000-%23E69F00-%2356B4E9-%23009E73-%23F0E442-%230072B2-%23D55E00-%23CC79A7
+                Theme {
+                    dir_color: Color::Rgb(86, 180, 233),
+                    cmd_color: Color::Rgb(0, 114, 178),
+                    dir_icon: "  ",
+                    cmd_icon: "  ",
+                    fail_color: Color::Rgb(213, 94, 0),
+                    success_color: Color::Rgb(0, 158, 115),
+                }
+            }
         }
     }
 }
